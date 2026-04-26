@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PFOB Football Stat</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-900 p-4 md:p-10 min-h-screen flex items-center justify-center text-slate-200">
+
+    <div class="max-w-xl w-full bg-slate-800 shadow-2xl rounded-[2.5rem] overflow-hidden border border-slate-700">
+        <div class="bg-blue-500 h-2 w-full"></div>
+        <div class="p-8 md:p-10">
+            <header class="mb-8 text-center">
+                <h1 class="text-3xl font-black text-white tracking-tight italic uppercase">PFOB Football Stat</h1>
+                <p class="text-slate-400 text-sm mt-1 font-bold">賽後數據自動化錄入</p>
+            </header>
+
+            <form id="matchForm" class="space-y-6">
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">📅 Match Date</label>
+                    <input type="date" id="matchDate" required class="w-full bg-slate-700 rounded-2xl p-4 outline-none font-bold text-white">
+                </div>
+
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">⚪ Team White (W)</label>
+                        <textarea id="teamW" placeholder="小明,阿華 (逗號隔開)" rows="2" required class="w-full bg-slate-700 rounded-2xl p-4 text-sm font-medium outline-none"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-blue-400 uppercase tracking-widest mb-2">🔵 Team Blue (B)</label>
+                        <textarea id="teamB" placeholder="志偉,大文 (逗號隔開)" rows="2" required class="w-full bg-slate-700 rounded-2xl p-4 text-sm font-medium outline-none"></textarea>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">🏆 Winner</label>
+                        <select id="winner" class="w-full bg-slate-700 rounded-2xl p-4 outline-none font-bold text-white">
+                            <option value="W">White 勝</option>
+                            <option value="B">Blue 勝</option>
+                            <option value="Draw">平手</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">⭐ Scorers</label>
+                        <input type="text" id="scorers" placeholder="例: 小明,小明,阿華" class="w-full bg-slate-700 rounded-2xl p-4 text-sm outline-none">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">👟 Assists</label>
+                    <input type="text" id="assisters" placeholder="例: 大強,小明" class="w-full bg-slate-700 rounded-2xl p-4 text-sm outline-none">
+                </div>
+
+                <div class="pt-6">
+                    <button type="submit" id="submitBtn" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-5 rounded-2xl transition-all active:scale-95 tracking-widest uppercase">
+                        CONFIRM & SUBMIT
+                    </button>
+                    <p id="statusMsg" class="text-center mt-6 text-sm font-bold hidden"></p>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbzGf2nwjt1Mig5n2DLcbcmjZMYV44nqSjGYTmwA2nOo5KlxdCbTKrLd5Jt-V1L-N6VQPw/exec'; 
+        const form = document.getElementById('matchForm');
+        const btn = document.getElementById('submitBtn');
+        const msg = document.getElementById('statusMsg');
+
+        form.addEventListener('submit', e => {
+            e.preventDefault();
+            btn.disabled = true;
+            btn.innerText = 'UPLOADING...';
+            msg.classList.remove('hidden', 'text-green-400', 'text-red-400');
+            msg.innerText = '📡 正在同步數據...';
+            msg.classList.add('text-blue-400');
+
+            const payload = {
+                date: document.getElementById('matchDate').value,
+                teamW: document.getElementById('teamW').value,
+                teamB: document.getElementById('teamB').value,
+                winner: document.getElementById('winner').value,
+                scorers: document.getElementById('scorers').value,
+                assisters: document.getElementById('assisters').value
+            };
+
+            fetch(scriptURL, { method: 'POST', body: JSON.stringify(payload) })
+            .then(() => {
+                msg.innerText = '✅ 提交成功！';
+                msg.classList.replace('text-blue-400', 'text-green-400');
+                form.reset();
+                btn.disabled = false;
+                btn.innerText = 'CONFIRM & SUBMIT';
+            })
+            .catch(error => {
+                msg.innerText = '❌ 錯誤，請檢查權限設定';
+                msg.classList.replace('text-blue-400', 'text-red-400');
+                btn.disabled = false;
+                btn.innerText = 'CONFIRM & SUBMIT';
+            });
+        });
+    </script>
+</body>
+</html>
