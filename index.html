@@ -3,100 +3,138 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PFOB Football Stat v3</title>
+    <title>PFOB Football Stat v4</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <style>
-        .player-chip { cursor: pointer; transition: all 0.2s; }
-        .selected-w { background-color: #ffffff; color: #1e293b; border-color: #3b82f6; }
-        .selected-b { background-color: #3b82f6; color: white; border-color: #2563eb; }
+        /* 深度美化 Select2 */
+        .select2-container--default .select2-selection--multiple {
+            background-color: #334155; border: none; border-radius: 0.75rem; padding: 5px;
+        }
+        .select2-container--default .select2-selection--multiple .select2-selection__choice {
+            background-color: #3b82f6; border: none; color: white; border-radius: 0.5rem; padding: 2px 8px;
+        }
+        .select2-dropdown { background-color: #1e293b; color: white; border: 1px solid #475569; }
+        .select2-results__option--highlighted { background-color: #3b82f6 !important; }
+        .select2-search__field { color: white !important; }
     </style>
 </head>
 <body class="bg-slate-900 p-4 min-h-screen flex items-center justify-center text-slate-200">
     <div class="max-w-2xl w-full bg-slate-800 shadow-2xl rounded-[2.5rem] overflow-hidden border border-slate-700 p-8">
-        <header class="mb-6 text-center">
-            <h1 class="text-2xl font-black text-white italic uppercase tracking-tighter">PFOB Football Stat</h1>
-            <p id="loadingMsg" class="text-blue-400 text-xs animate-pulse mt-2">正在載入球員名單...</p>
+        <header class="mb-8 text-center">
+            <h1 class="text-3xl font-black text-white italic uppercase tracking-tighter">PFOB Football Stat</h1>
+            <p class="text-slate-400 text-xs mt-2">Professional Match Reporting System</p>
         </header>
 
-        <form id="matchForm" class="space-y-5">
-            <input type="date" id="matchDate" required class="w-full bg-slate-700 rounded-xl p-3 text-white outline-none">
-
-            <div class="bg-slate-900/50 p-4 rounded-2xl border border-slate-700">
-                <label class="block text-xs font-bold text-slate-500 uppercase mb-3 text-center">點擊名單分隊 (白隊 -> 藍隊 -> 重置)</label>
-                <div id="playerContainer" class="flex flex-wrap gap-2 justify-center"></div>
+        <form id="matchForm" class="space-y-6">
+            <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase mb-2">📅 Match Date</label>
+                <input type="date" id="matchDate" required class="w-full bg-slate-700 rounded-xl p-3 text-white outline-none border border-slate-600">
             </div>
 
-            <div class="grid grid-cols-2 gap-4">
-                <div class="bg-white/5 p-3 rounded-xl border border-white/10">
-                    <label class="block text-[10px] font-bold text-slate-400 mb-1 uppercase">White Score</label>
-                    <input type="number" id="scoreW" value="0" class="w-full bg-transparent text-xl font-black text-white outline-none">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 uppercase mb-2">⚪ Team White (W)</label>
+                    <select id="teamW" class="player-select w-full" multiple="multiple"></select>
                 </div>
-                <div class="bg-blue-500/10 p-3 rounded-xl border border-blue-500/20">
-                    <label class="block text-[10px] font-bold text-blue-400 mb-1 uppercase">Blue Score</label>
-                    <input type="number" id="scoreB" value="0" class="w-full bg-transparent text-xl font-black text-white outline-none">
+                <div>
+                    <label class="block text-xs font-bold text-blue-400 uppercase mb-2">🔵 Team Blue (B)</label>
+                    <select id="teamB" class="player-select w-full" multiple="multiple"></select>
                 </div>
             </div>
 
-            <div class="grid grid-cols-2 gap-4">
-                <select id="winner" class="bg-slate-700 rounded-xl p-3 font-bold text-white outline-none appearance-none">
+            <div class="grid grid-cols-2 gap-4 bg-slate-900/50 p-4 rounded-2xl">
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">W Score</label>
+                    <input type="number" id="scoreW" value="0" class="w-full bg-transparent text-2xl font-black text-white outline-none">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-blue-500 uppercase mb-1">B Score</label>
+                    <input type="number" id="scoreB" value="0" class="w-full bg-transparent text-2xl font-black text-blue-500 outline-none">
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-yellow-500 uppercase mb-2">⭐ Scorers (Can select multiple)</label>
+                    <select id="scorers" class="player-select w-full" multiple="multiple"></select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-green-500 uppercase mb-2">👟 Assists</label>
+                    <select id="assisters" class="player-select w-full" multiple="multiple"></select>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase mb-2">🏆 Official Result</label>
+                <select id="winner" class="w-full bg-slate-700 rounded-xl p-3 font-bold text-white outline-none border border-slate-600">
                     <option value="W">White 勝</option>
                     <option value="B">Blue 勝</option>
                     <option value="Draw">平手</option>
                 </select>
-                <input type="text" id="scorers" placeholder="進球者: 小明,小明" class="bg-slate-700 rounded-xl p-3 text-sm outline-none">
             </div>
 
-            <input type="text" id="assisters" placeholder="助攻者: 大強,阿華" class="w-full bg-slate-700 rounded-xl p-3 text-sm outline-none">
-
-            <button type="submit" id="submitBtn" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-4 rounded-2xl transition-all uppercase tracking-widest active:scale-95">
-                CONFIRM & SUBMIT
+            <button type="submit" id="submitBtn" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-4 rounded-2xl transition-all uppercase tracking-widest active:scale-95 shadow-lg shadow-blue-600/20">
+                SUBMIT MATCH DATA
             </button>
         </form>
     </div>
 
     <script>
         const scriptURL = 'https://script.google.com/macros/s/AKfycbxKEFjKHcSQ4wRtHoQPwFgip1SCCbFPLU64J3EvQcRgNu-YuQ273tx14qBp4CjEofT-/exec';
-        const container = document.getElementById('playerContainer');
-        let playersW = [], playersB = [];
 
-        fetch(scriptURL).then(r => r.json()).then(names => {
-            document.getElementById('loadingMsg').remove();
-            names.forEach(name => {
-                const chip = document.createElement('div');
-                chip.innerText = name;
-                chip.className = 'px-3 py-1.5 bg-slate-700 rounded-full text-xs font-bold border-2 border-transparent player-chip transition-all';
-                chip.onclick = () => {
-                    if (!playersW.includes(name) && !playersB.includes(name)) {
-                        playersW.push(name); chip.classList.add('selected-w');
-                    } else if (playersW.includes(name)) {
-                        playersW = playersW.filter(n => n !== name); playersB.push(name);
-                        chip.classList.replace('selected-w', 'selected-b');
-                    } else {
-                        playersB = playersB.filter(n => n !== name); chip.classList.remove('selected-b');
-                    }
+        $(document).ready(function() {
+            // 初始化 Select2
+            function initSelect2(selector, placeholder) {
+                $(selector).select2({
+                    placeholder: placeholder,
+                    allowClear: true,
+                    width: '100%'
+                });
+            }
+
+            // 從 Google Sheets 抓取球員名單並填入所有下拉框
+            fetch(scriptURL)
+                .then(r => r.json())
+                .then(names => {
+                    const selects = ['#teamW', '#teamB', '#scorers', '#assisters'];
+                    selects.forEach(s => {
+                        names.forEach(name => {
+                            $(s).append(new Option(name, name, false, false));
+                        });
+                        initSelect2(s, "選擇球員...");
+                    });
+                });
+
+            $('#matchForm').submit(function(e) {
+                e.preventDefault();
+                const btn = $('#submitBtn');
+                btn.prop('disabled', true).text('UPLOADING...');
+
+                const payload = {
+                    date: $('#matchDate').val(),
+                    teamW: $('#teamW').val().join(','),
+                    teamB: $('#teamB').val().join(','),
+                    scoreW: $('#scoreW').val(),
+                    scoreB: $('#scoreB').val(),
+                    winner: $('#winner').val(),
+                    scorers: $('#scorers').val().join(','),
+                    assisters: $('#assisters').val().join(',')
                 };
-                container.appendChild(chip);
+
+                fetch(scriptURL, { method: 'POST', body: JSON.stringify(payload) })
+                .then(() => {
+                    alert('✅ 數據已成功錄入！');
+                    location.reload();
+                })
+                .catch(err => {
+                    alert('❌ 發生錯誤，請檢查網路');
+                    btn.prop('disabled', false).text('SUBMIT MATCH DATA');
+                });
             });
         });
-
-        document.getElementById('matchForm').onsubmit = e => {
-            e.preventDefault();
-            const btn = document.getElementById('submitBtn');
-            btn.disabled = true; btn.innerText = 'UPLOADING...';
-
-            const payload = {
-                date: document.getElementById('matchDate').value,
-                teamW: playersW.join(','), teamB: playersB.join(','),
-                scoreW: document.getElementById('scoreW').value,
-                scoreB: document.getElementById('scoreB').value,
-                winner: document.getElementById('winner').value,
-                scorers: document.getElementById('scorers').value,
-                assisters: document.getElementById('assisters').value
-            };
-
-            fetch(scriptURL, { method: 'POST', body: JSON.stringify(payload) })
-            .then(() => { alert('✅ 成功同步至 PFOB 系統！'); location.reload(); });
-        };
     </script>
 </body>
 </html>
