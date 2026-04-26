@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PFOB Football Stat v4</title>
+    <title>PFOB Football Stat v5</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <style>
-        /* 深度美化 Select2 */
+        /* Select2 暗色模式美化 */
         .select2-container--default .select2-selection--multiple {
-            background-color: #334155; border: none; border-radius: 0.75rem; padding: 5px;
+            background-color: #334155; border: 1px solid #475569; border-radius: 0.75rem; padding: 5px;
         }
         .select2-container--default .select2-selection--multiple .select2-selection__choice {
             background-color: #3b82f6; border: none; color: white; border-radius: 0.5rem; padding: 2px 8px;
@@ -19,57 +19,60 @@
         .select2-dropdown { background-color: #1e293b; color: white; border: 1px solid #475569; }
         .select2-results__option--highlighted { background-color: #3b82f6 !important; }
         .select2-search__field { color: white !important; }
+        .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+            color: #ffffff; margin-right: 5px;
+        }
     </style>
 </head>
-<body class="bg-slate-900 p-4 min-h-screen flex items-center justify-center text-slate-200">
-    <div class="max-w-2xl w-full bg-slate-800 shadow-2xl rounded-[2.5rem] overflow-hidden border border-slate-700 p-8">
+<body class="bg-slate-900 p-4 min-h-screen flex items-center justify-center text-slate-200 font-sans">
+    <div class="max-w-2xl w-full bg-slate-800 shadow-2xl rounded-[2.5rem] overflow-hidden border border-slate-700 p-8 md:p-10">
         <header class="mb-8 text-center">
             <h1 class="text-3xl font-black text-white italic uppercase tracking-tighter">PFOB Football Stat</h1>
-            <p class="text-slate-400 text-xs mt-2">Professional Match Reporting System</p>
+            <p id="loadingMsg" class="text-blue-400 text-xs animate-pulse mt-2 font-bold">📡 同步雲端球員名單中...</p>
         </header>
 
         <form id="matchForm" class="space-y-6">
             <div>
-                <label class="block text-xs font-bold text-slate-500 uppercase mb-2">📅 Match Date</label>
-                <input type="date" id="matchDate" required class="w-full bg-slate-700 rounded-xl p-3 text-white outline-none border border-slate-600">
+                <label class="block text-xs font-bold text-slate-500 uppercase mb-2 tracking-widest">📅 Match Date</label>
+                <input type="date" id="matchDate" required class="w-full bg-slate-700 rounded-xl p-3 text-white outline-none border border-slate-600 focus:border-blue-500 transition-all">
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                    <label class="block text-xs font-bold text-slate-400 uppercase mb-2">⚪ Team White (W)</label>
-                    <select id="teamW" class="player-select w-full" multiple="multiple"></select>
+                    <label class="block text-xs font-bold text-slate-400 uppercase mb-2 tracking-widest">⚪ Team White (W)</label>
+                    <select id="teamW" class="w-full" multiple="multiple"></select>
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-blue-400 uppercase mb-2">🔵 Team Blue (B)</label>
-                    <select id="teamB" class="player-select w-full" multiple="multiple"></select>
+                    <label class="block text-xs font-bold text-blue-400 uppercase mb-2 tracking-widest">🔵 Team Blue (B)</label>
+                    <select id="teamB" class="w-full" multiple="multiple"></select>
                 </div>
             </div>
 
-            <div class="grid grid-cols-2 gap-4 bg-slate-900/50 p-4 rounded-2xl">
+            <div class="grid grid-cols-2 gap-4 bg-slate-900/50 p-5 rounded-2xl border border-slate-700">
                 <div>
-                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">W Score</label>
-                    <input type="number" id="scoreW" value="0" class="w-full bg-transparent text-2xl font-black text-white outline-none">
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1 text-center">White Score</label>
+                    <input type="number" id="scoreW" value="0" min="0" class="w-full bg-transparent text-3xl font-black text-white text-center outline-none">
                 </div>
                 <div>
-                    <label class="block text-[10px] font-bold text-blue-500 uppercase mb-1">B Score</label>
-                    <input type="number" id="scoreB" value="0" class="w-full bg-transparent text-2xl font-black text-blue-500 outline-none">
+                    <label class="block text-[10px] font-bold text-blue-500 uppercase mb-1 text-center">Blue Score</label>
+                    <input type="number" id="scoreB" value="0" min="0" class="w-full bg-transparent text-3xl font-black text-blue-500 text-center outline-none">
                 </div>
             </div>
 
             <div class="space-y-4">
                 <div>
-                    <label class="block text-xs font-bold text-yellow-500 uppercase mb-2">⭐ Scorers (Can select multiple)</label>
-                    <select id="scorers" class="player-select w-full" multiple="multiple"></select>
+                    <label class="block text-xs font-bold text-yellow-500 uppercase mb-2 tracking-widest">⭐ Scorers (Can select same player multiple times)</label>
+                    <select id="scorers" class="w-full" multiple="multiple"></select>
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-green-500 uppercase mb-2">👟 Assists</label>
-                    <select id="assisters" class="player-select w-full" multiple="multiple"></select>
+                    <label class="block text-xs font-bold text-green-500 uppercase mb-2 tracking-widest">👟 Assists</label>
+                    <select id="assisters" class="w-full" multiple="multiple"></select>
                 </div>
             </div>
 
             <div>
-                <label class="block text-xs font-bold text-slate-500 uppercase mb-2">🏆 Official Result</label>
-                <select id="winner" class="w-full bg-slate-700 rounded-xl p-3 font-bold text-white outline-none border border-slate-600">
+                <label class="block text-xs font-bold text-slate-500 uppercase mb-2 tracking-widest">🏆 Official Result</label>
+                <select id="winner" class="w-full bg-slate-700 rounded-xl p-3 font-bold text-white outline-none border border-slate-600 appearance-none">
                     <option value="W">White 勝</option>
                     <option value="B">Blue 勝</option>
                     <option value="Draw">平手</option>
@@ -79,62 +82,86 @@
             <button type="submit" id="submitBtn" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-4 rounded-2xl transition-all uppercase tracking-widest active:scale-95 shadow-lg shadow-blue-600/20">
                 SUBMIT MATCH DATA
             </button>
+            <p id="statusMsg" class="text-center text-sm font-bold hidden"></p>
         </form>
     </div>
 
     <script>
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbxKEFjKHcSQ4wRtHoQPwFgip1SCCbFPLU64J3EvQcRgNu-YuQ273tx14qBp4CjEofT-/exec';
+        // 🚨 請在此處替換成你的 Google Apps Script 部署 URL
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbz2l72R3qlRx5nhRJ4kar2Ikud2-eT13FwfcxD4JPfNFPOUOxnLBp_bGHc19mEyLa-Ocg/exec';
 
         $(document).ready(function() {
-            // 初始化 Select2
-            function initSelect2(selector, placeholder) {
+            // 初始化 Select2 函式
+            function initSelect2(selector, placeholder, allowDuplicates = false) {
                 $(selector).select2({
                     placeholder: placeholder,
                     allowClear: true,
-                    width: '100%'
+                    width: '100%',
+                    tags: allowDuplicates, // 設為 true 以允許重複選擇/手動輸入
+                    tokenSeparators: [',']
                 });
             }
 
-            // 從 Google Sheets 抓取球員名單並填入所有下拉框
+            // 1. 從 Google Sheets 抓取名單
             fetch(scriptURL)
                 .then(r => r.json())
                 .then(names => {
-                    const selects = ['#teamW', '#teamB', '#scorers', '#assisters'];
-                    selects.forEach(s => {
+                    $('#loadingMsg').addClass('hidden');
+                    const selects = [
+                        { id: '#teamW', dup: false },
+                        { id: '#teamB', dup: false },
+                        { id: '#scorers', dup: true },
+                        { id: '#assisters', dup: true }
+                    ];
+
+                    selects.forEach(item => {
                         names.forEach(name => {
-                            $(s).append(new Option(name, name, false, false));
+                            $(item.id).append(new Option(name, name, false, false));
                         });
-                        initSelect2(s, "選擇球員...");
+                        initSelect2(item.id, "請選擇球員...", item.dup);
                     });
+                })
+                .catch(err => {
+                    $('#loadingMsg').text('❌ 名單讀取失敗，請檢查 URL').classList.replace('text-blue-400', 'text-red-500');
                 });
 
+            // 2. 提交表單邏輯
             $('#matchForm').submit(function(e) {
                 e.preventDefault();
                 const btn = $('#submitBtn');
+                const msg = $('#statusMsg');
+                
                 btn.prop('disabled', true).text('UPLOADING...');
+                msg.removeClass('hidden text-green-400 text-red-400').addClass('text-blue-400').text('正在同步數據...');
 
                 const payload = {
                     date: $('#matchDate').val(),
-                    teamW: $('#teamW').val().join(','),
-                    teamB: $('#teamB').val().join(','),
+                    teamW: ($('#teamW').val() || []).join(','),
+                    teamB: ($('#teamB').val() || []).join(','),
                     scoreW: $('#scoreW').val(),
                     scoreB: $('#scoreB').val(),
                     winner: $('#winner').val(),
-                    scorers: $('#scorers').val().join(','),
-                    assisters: $('#assisters').val().join(',')
+                    scorers: ($('#scorers').val() || []).join(','),
+                    assisters: ($('#assisters').val() || []).join(',')
                 };
 
                 fetch(scriptURL, { method: 'POST', body: JSON.stringify(payload) })
-                .then(() => {
-                    alert('✅ 數據已成功錄入！');
-                    location.reload();
+                .then(response => {
+                    msg.text('✅ 數據已成功錄入試算表！').replaceClass('text-blue-400', 'text-green-400');
+                    setTimeout(() => location.reload(), 2000);
                 })
                 .catch(err => {
-                    alert('❌ 發生錯誤，請檢查網路');
+                    alert('❌ 發生錯誤，請檢查網路連接或權限設定');
                     btn.prop('disabled', false).text('SUBMIT MATCH DATA');
+                    msg.addClass('hidden');
                 });
             });
         });
+
+        // 輔助函式：切換 Class
+        $.fn.replaceClass = function(pFrom, pTo) {
+            return this.removeClass(pFrom).addClass(pTo);
+        };
     </script>
 </body>
 </html>
