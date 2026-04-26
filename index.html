@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PFOB Football Stat v6</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>PFOB Football Stat v7</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .select2-container--default .select2-selection--multiple {
             background-color: #334155; border: 1px solid #475569; border-radius: 0.75rem; padding: 5px;
@@ -20,122 +20,121 @@
         .select2-search__field { color: white !important; }
     </style>
 </head>
-<body class="bg-slate-900 p-4 min-h-screen flex items-center justify-center text-slate-200 font-sans">
-    <div class="max-w-2xl w-full bg-slate-800 shadow-2xl rounded-[2.5rem] border border-slate-700 p-8 md:p-10">
+<body class="bg-slate-900 p-4 min-h-screen flex items-center justify-center text-slate-200">
+    <div class="max-w-2xl w-full bg-slate-800 shadow-2xl rounded-[2.5rem] border border-slate-700 p-8">
         <header class="mb-8 text-center">
             <h1 class="text-3xl font-black text-white italic uppercase tracking-tighter">PFOB Football Stat</h1>
-            <p id="loadingMsg" class="text-blue-400 text-xs animate-pulse mt-2 font-bold">📡 同步雲端球員名單中...</p>
+            <p id="loadingMsg" class="text-blue-400 text-xs animate-pulse mt-2 font-bold">📡 同步名單中...</p>
         </header>
 
         <form id="matchForm" class="space-y-6">
-            <div>
-                <label class="block text-xs font-bold text-slate-500 uppercase mb-2 tracking-widest">📅 Match Date</label>
-                <input type="date" id="matchDate" required class="w-full bg-slate-700 rounded-xl p-3 text-white outline-none border border-slate-600 focus:border-blue-500 transition-all">
-            </div>
+            <input type="date" id="matchDate" required class="w-full bg-slate-700 rounded-xl p-3 text-white outline-none border border-slate-600">
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                    <label class="block text-xs font-bold text-slate-400 uppercase mb-2 tracking-widest">⚪ Team White (W)</label>
+                    <label class="block text-xs font-bold text-slate-400 uppercase mb-2">⚪ Team White</label>
                     <select id="teamW" class="w-full" multiple="multiple"></select>
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-blue-400 uppercase mb-2 tracking-widest">🔵 Team Blue (B)</label>
+                    <label class="block text-xs font-bold text-blue-400 uppercase mb-2">🔵 Team Blue</label>
                     <select id="teamB" class="w-full" multiple="multiple"></select>
                 </div>
             </div>
 
             <div class="grid grid-cols-2 gap-4 bg-slate-900/50 p-5 rounded-2xl border border-slate-700">
                 <div>
-                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1 text-center">White Score</label>
-                    <input type="number" id="scoreW" value="0" min="0" class="w-full bg-transparent text-3xl font-black text-white text-center outline-none">
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1 text-center">W Score</label>
+                    <input type="number" id="scoreW" value="0" class="w-full bg-transparent text-3xl font-black text-white text-center outline-none">
                 </div>
                 <div>
-                    <label class="block text-[10px] font-bold text-blue-500 uppercase mb-1 text-center">Blue Score</label>
-                    <input type="number" id="scoreB" value="0" min="0" class="w-full bg-transparent text-3xl font-black text-blue-500 text-center outline-none">
+                    <label class="block text-[10px] font-bold text-blue-500 uppercase mb-1 text-center">B Score</label>
+                    <input type="number" id="scoreB" value="0" class="w-full bg-transparent text-3xl font-black text-blue-500 text-center outline-none">
                 </div>
             </div>
 
             <div class="space-y-4">
                 <div>
-                    <label class="block text-xs font-bold text-yellow-500 uppercase mb-2 tracking-widest">⭐ Scorers (Multi-Select Enabled)</label>
+                    <label class="block text-xs font-bold text-yellow-500 uppercase mb-2">⭐ Scorers (Click multiple times for more goals)</label>
                     <select id="scorers" class="w-full" multiple="multiple"></select>
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-green-500 uppercase mb-2 tracking-widest">👟 Assists (Multi-Select Enabled)</label>
+                    <label class="block text-xs font-bold text-green-500 uppercase mb-2">👟 Assists</label>
                     <select id="assisters" class="w-full" multiple="multiple"></select>
                 </div>
             </div>
 
-            <div>
-                <label class="block text-xs font-bold text-slate-500 uppercase mb-2 tracking-widest">🏆 Official Result</label>
-                <select id="winner" class="w-full bg-slate-700 rounded-xl p-3 font-bold text-white outline-none border border-slate-600 appearance-none">
-                    <option value="W">White 勝</option>
-                    <option value="B">Blue 勝</option>
-                    <option value="Draw">平手</option>
-                </select>
-            </div>
+            <select id="winner" class="w-full bg-slate-700 rounded-xl p-3 font-bold text-white outline-none border border-slate-600">
+                <option value="W">White 勝</option>
+                <option value="B">Blue 勝</option>
+                <option value="Draw">平手</option>
+            </select>
 
-            <button type="submit" id="submitBtn" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-4 rounded-2xl transition-all uppercase tracking-widest active:scale-95 shadow-lg shadow-blue-600/20">
+            <button type="submit" id="submitBtn" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-4 rounded-2xl transition-all uppercase tracking-widest active:scale-95">
                 SUBMIT MATCH DATA
             </button>
-            <p id="statusMsg" class="text-center text-sm font-bold hidden"></p>
         </form>
     </div>
 
     <script>
-        // 🚨 請替換成你的 Google Apps Script URL
         const scriptURL = 'https://script.google.com/macros/s/AKfycbz2l72R3qlRx5nhRJ4kar2Ikud2-eT13FwfcxD4JPfNFPOUOxnLBp_bGHc19mEyLa-Ocg/exec';
 
         $(document).ready(function() {
-            // 核心功能：初始化 Select2 並強制允許重複選擇
-            function initSelect2(selector, placeholder, allowDuplicates) {
-                const $el = $(selector);
-                
-                $el.select2({
-                    placeholder: placeholder,
-                    allowClear: true,
-                    width: '100%',
-                    tags: allowDuplicates,
-                    tokenSeparators: [','],
-                    // 關鍵設定：不隱藏已選中的選項
-                    closeOnSelect: false 
-                });
-
-                // 如果允許重複，我們在每次選中後重新顯示所有選項
-                if (allowDuplicates) {
-                    $el.on('select2:select', function (e) {
-                        const selectedValues = $el.val();
-                        // 這裡可以加入特定邏輯處理重複，但 Select2 tags 模式下，
-                        // 連續點擊同一個項目會導致移除。所以我們讓它保持開啟。
-                    });
-                }
+            function initStandardSelect(selector, placeholder) {
+                $(selector).select2({ placeholder: placeholder, width: '100%' });
             }
 
-            fetch(scriptURL)
-                .then(r => r.json())
-                .then(names => {
-                    $('#loadingMsg').addClass('hidden');
-                    const config = [
-                        { id: '#teamW', dup: false },
-                        { id: '#teamB', dup: false },
-                        { id: '#scorers', dup: true },
-                        { id: '#assisters', dup: true }
-                    ];
-
-                    config.forEach(item => {
-                        names.forEach(name => {
-                            $(item.id).append(new Option(name, name, false, false));
-                        });
-                        initSelect2(item.id, "請選擇球員...", item.dup);
-                    });
+            // 修正：針對需要重複選擇的欄位
+            function initMultiEntrySelect(selector, placeholder) {
+                const $el = $(selector);
+                $el.select2({
+                    placeholder: placeholder,
+                    width: '100%',
+                    tags: true, // 允許標籤化
+                    closeOnSelect: false
+                }).on('select2:select', function(e) {
+                    // 核心邏輯：當選中一個球員後，我們不讓他「佔住」那個選項，而是直接確認他被選了
+                    // 透過 tags: true，Select2 會允許手動添加，但我們需要防止它在第二次點擊時取消
                 });
+            }
+
+            fetch(scriptURL).then(r => r.json()).then(names => {
+                $('#loadingMsg').addClass('hidden');
+                ['#teamW', '#teamB', '#scorers', '#assisters'].forEach(id => {
+                    names.forEach(name => $(id).append(new Option(name, name, false, false)));
+                    // 隊伍不重複，進球與助攻允許重複
+                    if(id === '#scorers' || id === '#assisters') {
+                        $(id).select2({
+                            placeholder: "可重複選擇球員",
+                            tags: true,
+                            width: '100%',
+                            tokenSeparators: [','],
+                            closeOnSelect: false
+                        });
+                        
+                        // 暴力修正：強制允許重複標籤
+                        $(id).on('select2:selecting', function(e) {
+                            const $this = $(this);
+                            const val = e.params.args.data.id;
+                            const current = $this.val() || [];
+                            
+                            // 這裡手動推入值並觸發變更，繞過 Select2 的唯一性檢查
+                            current.push(val);
+                            $this.val(current).trigger('change');
+                            
+                            // 阻止預設行為（防止它因為「已選中」而取消）
+                            e.preventDefault();
+                            $this.select2('close').select2('open');
+                        });
+                    } else {
+                        initStandardSelect(id, "請選擇球員...");
+                    }
+                });
+            });
 
             $('#matchForm').submit(function(e) {
                 e.preventDefault();
                 const btn = $('#submitBtn');
-                const msg = $('#statusMsg');
                 btn.prop('disabled', true).text('UPLOADING...');
-                msg.removeClass('hidden text-green-400 text-red-400').addClass('text-blue-400').text('正在同步數據...');
 
                 const payload = {
                     date: $('#matchDate').val(),
@@ -149,14 +148,7 @@
                 };
 
                 fetch(scriptURL, { method: 'POST', body: JSON.stringify(payload) })
-                .then(() => {
-                    msg.text('✅ 數據已成功錄入！').removeClass('text-blue-400').addClass('text-green-400');
-                    setTimeout(() => location.reload(), 2000);
-                })
-                .catch(err => {
-                    alert('❌ 錄入失敗');
-                    btn.prop('disabled', false).text('SUBMIT MATCH DATA');
-                });
+                .then(() => { alert('✅ 錄入成功！'); location.reload(); });
             });
         });
     </script>
